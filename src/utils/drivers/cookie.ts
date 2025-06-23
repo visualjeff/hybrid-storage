@@ -65,12 +65,12 @@ export default defineDriver((opts: CookieOptions = {}) => {
     name: DRIVER_NAME,
     options: opts,
     
-    hasItem(key: string): boolean {
+    async hasItem(key: string): Promise<boolean> {
       const value = getCookie(makeKey(key));
       return value !== null;
     },
     
-    getItem(key: string): unknown {
+    async getItem(key: string): Promise<unknown> {
       const value = getCookie(makeKey(key));
       if (value === null) return null;
       try {
@@ -80,12 +80,12 @@ export default defineDriver((opts: CookieOptions = {}) => {
       }
     },
     
-    getItemRaw(key: string): string | null {
+    async getItemRaw(key: string): Promise<string | null> {
       const value = getCookie(makeKey(key));
       return value === null ? null : decodeURIComponent(value);
     },
     
-    setItem(key: string, value: unknown): void {
+    async setItem(key: string, value: unknown): Promise<void> {
       const stringValue = typeof value === "string" 
         ? value 
         : JSON.stringify(value);
@@ -98,7 +98,7 @@ export default defineDriver((opts: CookieOptions = {}) => {
       });
     },
     
-    setItemRaw(key: string, value: string): void {
+    async setItemRaw(key: string, value: string): Promise<void> {
       setCookie(makeKey(key), value, {
         maxAge,
         path,
@@ -108,11 +108,11 @@ export default defineDriver((opts: CookieOptions = {}) => {
       });
     },
     
-    removeItem(key: string): void {
+    async removeItem(key: string): Promise<void> {
       deleteCookie(makeKey(key));
     },
     
-    getKeys(): string[] {
+    async getKeys(): Promise<string[]> {
       return document.cookie
         .split("; ")
         .map((cookie: string) => cookie.split("=")[0])
@@ -120,10 +120,12 @@ export default defineDriver((opts: CookieOptions = {}) => {
         .map((key: string) => key.slice(prefix.length));
     },
     
-    clear(): void {
-      const keys = this.getKeys();
-      keys.forEach((key: string) => this.removeItem(key));
+    async clear(): Promise<void> {
+      const keys = await this.getKeys();
+      for (const key of keys) {
+        await this.removeItem(key);
+      }
     }
-  // @ts-ignore - unstorage driver interface compatibility
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;
 }); 

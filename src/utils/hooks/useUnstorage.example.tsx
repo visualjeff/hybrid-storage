@@ -45,6 +45,16 @@ export function UnstorageExample({ storage }: ExampleProps) {
     defaultValue: { name: "John", age: 30 }
   });
 
+  // Subscription demo - this will update when other components change the same key
+  const { 
+    value: subscriptionValue, 
+    setValue: setSubscriptionValue 
+  } = useUnstorage(storage, "subscription:demo", {
+    defaultValue: "Initial value",
+    subscribe: true, // Enable real-time updates
+    pollInterval: 500 // Check for changes every 500ms
+  });
+
   return (
     <div style={{ padding: '1rem', border: '1px solid #ccc', margin: '1rem 0' }}>
       <h3>useUnstorage Hook Examples</h3>
@@ -112,6 +122,27 @@ export function UnstorageExample({ storage }: ExampleProps) {
           })}>
             Update Complex Data
           </button>
+        </div>
+      </div>
+
+      {/* Subscription Demo */}
+      <div style={{ marginBottom: '1rem', padding: '1rem', backgroundColor: '#f0f0f0' }}>
+        <h4>🔄 Real-time Subscription Demo</h4>
+        <p style={{ fontSize: '0.9em', color: '#666' }}>
+          This value will update automatically when changed by other components or external sources.
+          Open multiple browser tabs or use the browser console to test!
+        </p>
+        <div>
+          <p><strong>Current Value:</strong> {subscriptionValue}</p>
+          <button onClick={() => setSubscriptionValue("Updated via hook at " + new Date().toLocaleTimeString())}>
+            Update This Component
+          </button>
+        </div>
+        <div style={{ marginTop: '0.5rem', fontSize: '0.8em', color: '#666' }}>
+          <p>💡 Try this in the browser console:</p>
+          <code style={{ backgroundColor: '#fff', padding: '0.2rem 0.4rem', borderRadius: '3px' }}>
+            localStorage.setItem('subscription:demo', JSON.stringify('Updated from console at ' + new Date().toLocaleTimeString()))
+          </code>
         </div>
       </div>
     </div>

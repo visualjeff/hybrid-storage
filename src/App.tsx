@@ -1,19 +1,22 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import { createStorage } from "unstorage";
-// import localStorageDriver from "unstorage/drivers/localstorage";
-import cookieDriver from "./utils/drivers/cookie";
+import localStorageDriver from "unstorage/drivers/localstorage";
+//import sessionStorageDriver from "unstorage/drivers/sessionstorage";
+//import indexedDbDriver from "unstorage/drivers/indexedb";
+// import cookieDriver from "./utils/drivers/cookie";
 import { useUnstorage } from './utils/hooks';
+import { HybridSignalDemo } from './utils/hooks';
 import viteLogo from '/vite.svg'
 import './App.css'
 
-// NOTE: Default driver is memory
+// Regular storage using localStorage
 const storage = createStorage({
-  // driver: lruCacheDriver()
-  //driver: localStorageDriver({ base: 'app:', storage: 'localStorage' }),
-  driver: cookieDriver({ prefix: 'app:' })
+  driver: localStorageDriver({ base: 'app:'}) // local storage
+  //driver: sessionStorageDriver({ base: 'app:'}) // session storage
+  //driver: indexedDbDriver({ base: 'app:', dbName: 'TestDatabase', storeName: 'TestStore'}), // indexed db
+  //driver: cookieDriver({ prefix: 'app:' }) // cookie
 });
-
 
 function App() {
   const [count, setCount] = useState(0)
@@ -27,7 +30,9 @@ function App() {
     removeValue: removeStoredValue
   } = useUnstorage(storage, "foo:bar", {
     defaultValue: "test123",
-    onError: (error) => console.error('Storage error:', error)
+    onError: (error) => console.error('Storage error:', error),
+    subscribe: true, // Enable real-time updates
+    pollInterval: 1000 // Check for changes every second
   });
 
   // Example of setting a value programmatically
@@ -50,7 +55,7 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>Vite + React</h1>
+      <h1>Vite + React + Unstorage</h1>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
@@ -78,6 +83,10 @@ function App() {
           </button>
         </div>
       </div>
+
+      {/* Hybrid Signal Demo */}
+      <HybridSignalDemo storage={storage} />
+
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>

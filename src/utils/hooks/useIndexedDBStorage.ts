@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Storage, StorageValue } from 'unstorage';
 
-export interface UseUnstorageOptions<T = string> {
+export interface UseIndexedDBOptions<T = unknown> {
   defaultValue?: T;
   autoLoad?: boolean;
   onError?: (error: Error) => void;
@@ -10,8 +10,8 @@ export interface UseUnstorageOptions<T = string> {
   pollInterval?: number; // Polling interval in ms for drivers without change events (default: 1000)
 }
 
-// Global subscription manager
-class StorageSubscriptionManager {
+// Global subscription manager for IndexedDB
+class IndexedDBSubscriptionManager {
   private subscriptions = new Map<string, Set<() => void>>();
   private pollIntervals = new Map<string, number>();
   private lastValues = new Map<string, unknown>();
@@ -67,13 +67,13 @@ class StorageSubscriptionManager {
       const currentValue = await storage.getItem(key);
       const lastValue = this.lastValues.get(key);
       
-      // Deep comparison of values
+      // Deep comparison of values (no JSON stringify needed for IndexedDB)
       if (JSON.stringify(currentValue) !== JSON.stringify(lastValue)) {
         this.lastValues.set(key, currentValue);
         this.notifySubscribers(key);
       }
     } catch (error) {
-      console.warn('Error checking for storage changes:', error);
+      console.warn('Error checking for IndexedDB changes:', error);
     }
   }
 
@@ -84,7 +84,7 @@ class StorageSubscriptionManager {
         try {
           callback();
         } catch (error) {
-          console.error('Error in storage subscription callback:', error);
+          console.error('Error in IndexedDB subscription callback:', error);
         }
       });
     }
@@ -102,20 +102,23 @@ class StorageSubscriptionManager {
 }
 
 // Global instance
-const subscriptionManager = new StorageSubscriptionManager();
+const indexedDBSubscriptionManager = new IndexedDBSubscriptionManager();
 
-export function useUnstorage<T = string>(
+export function useIndexedDBStorage<T = unknown>(
   storage: Storage,
   key: string,
-  options: UseUnstorageOptions<T> = {}
+  options: UseIndexedDBOptions<T> = {}
 ) {
+  // Remove driver validation - allow any storage driver to work
+  // The hooks will work with any unstorage driver, not just IndexedDB
+
   const { 
     defaultValue, 
     autoLoad = true, 
     onError, 
     fallbackToDefault = true,
-    subscribe = true
-    // pollInterval = 1000 - temporarily disabled
+    subscribe = true,
+    pollInterval = 1000
   } = options;
   
   const [value, setValue] = useState<T | null>(defaultValue || null);
@@ -150,7 +153,7 @@ export function useUnstorage<T = string>(
       
       // Update the subscription manager's last known value
       if (subscribeRef.current) {
-        subscriptionManager.updateLastValue(keyRef.current, result);
+        indexedDBSubscriptionManager.updateLastValue(keyRef.current, result);
       }
     } catch (err) {
       const error = err as Error;
@@ -161,18 +164,19 @@ export function useUnstorage<T = string>(
     }
   }, []); // Empty dependency array - function never changes
 
-  // Set value in storage
+  // Set value in storage - no JSON stringification needed for IndexedDB
   const setValueAsync = useCallback(async (newValue: T) => {
     try {
       setLoading(true);
       setError(null);
+      // IndexedDB can store objects natively, no need to stringify
       await storageRef.current.setItem(keyRef.current, newValue as StorageValue);
       setValue(newValue);
       
       // Update the subscription manager's last known value and notify subscribers
       if (subscribeRef.current) {
-        subscriptionManager.updateLastValue(keyRef.current, newValue);
-        subscriptionManager.notifyChange(keyRef.current);
+        indexedDBSubscriptionManager.updateLastValue(keyRef.current, newValue);
+        indexedDBSubscriptionManager.notifyChange(keyRef.current);
       }
     } catch (err) {
       const error = err as Error;
@@ -194,8 +198,8 @@ export function useUnstorage<T = string>(
       
       // Update the subscription manager's last known value and notify subscribers
       if (subscribeRef.current) {
-        subscriptionManager.updateLastValue(keyRef.current, null);
-        subscriptionManager.notifyChange(keyRef.current);
+        indexedDBSubscriptionManager.updateLastValue(keyRef.current, null);
+        indexedDBSubscriptionManager.notifyChange(keyRef.current);
       }
     } catch (err) {
       const error = err as Error;
@@ -218,10 +222,10 @@ export function useUnstorage<T = string>(
     }
   }, []); // Empty dependency array - function never changes
 
-  // Get raw value (without parsing)
-  const getRawValue = useCallback(async (): Promise<string | null> => {
+  // Get raw value (without parsing) - for IndexedDB this is the same as getItem
+  const getRawValue = useCallback(async (): Promise<unknown> => {
     try {
-      return await storageRef.current.getItemRaw(keyRef.current);
+      return await storageRef.current.getItem(keyRef.current);
     } catch (err) {
       const error = err as Error;
       setError(error);
@@ -230,18 +234,18 @@ export function useUnstorage<T = string>(
     }
   }, []); // Empty dependency array - function never changes
 
-  // Set raw value (without stringifying)
-  const setRawValue = useCallback(async (rawValue: string) => {
+  // Set raw value (without stringifying) - for IndexedDB this is the same as setItem
+  const setRawValue = useCallback(async (rawValue: unknown) => {
     try {
       setLoading(true);
       setError(null);
-      await storageRef.current.setItemRaw(keyRef.current, rawValue);
+      await storageRef.current.setItem(keyRef.current, rawValue as StorageValue);
       setValue(rawValue as T);
       
       // Update the subscription manager's last known value and notify subscribers
       if (subscribeRef.current) {
-        subscriptionManager.updateLastValue(keyRef.current, rawValue);
-        subscriptionManager.notifyChange(keyRef.current);
+        indexedDBSubscriptionManager.updateLastValue(keyRef.current, rawValue);
+        indexedDBSubscriptionManager.notifyChange(keyRef.current);
       }
     } catch (err) {
       const error = err as Error;
@@ -254,15 +258,14 @@ export function useUnstorage<T = string>(
 
   // Subscribe to external changes
   useEffect(() => {
-    // Temporarily disable subscription to prevent infinite loops
-    // if (subscribe) {
-    //   unsubscribeRef.current = subscriptionManager.subscribe(
-    //     key, 
-    //     loadValue, 
-    //     storage,
-    //     pollInterval
-    //   );
-    // }
+    if (subscribe) {
+      unsubscribeRef.current = indexedDBSubscriptionManager.subscribe(
+        key, 
+        loadValue, 
+        storage,
+        pollInterval
+      );
+    }
 
     return () => {
       if (unsubscribeRef.current) {
@@ -270,7 +273,7 @@ export function useUnstorage<T = string>(
         unsubscribeRef.current = null;
       }
     };
-  }, []); // Empty dependency array - only run once
+  }, [key, subscribe, pollInterval, loadValue]);
 
   // Auto-load value on mount if enabled
   useEffect(() => {
@@ -304,4 +307,4 @@ export function useUnstorage<T = string>(
 }
 
 // Export the subscription manager for manual notifications
-export { subscriptionManager }; 
+export { indexedDBSubscriptionManager }; 

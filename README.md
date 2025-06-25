@@ -1,6 +1,6 @@
 # Hybrid-Storage
 
-This repository contains a set of React hooks for managing storage operations using the `unstorage` library, with specialized hooks for IndexedDB and hybrid signal systems. Below is the comprehensive documentation for all available hooks.
+This repository contains a set of React hooks for managing storage operations using the [unstorage](https://unstorage.unjs.io/) library, with specialized hooks for IndexedDB and hybrid signal systems. Below is the comprehensive documentation for all available hooks.
 
 ## Table of Contents
 - [useUnstorage Hook](#useunstorage-hook)
@@ -18,7 +18,7 @@ A comprehensive React hook for managing unstorage operations with built-in state
 - ✅ **Error handling** with custom error callbacks
 - ✅ **TypeScript support** with generic types
 - ✅ **Manual control** options (disable auto-load)
-- ✅ **Raw value operations** (get/set without JSON stringify and parsing; particularly optimized for IndexedDB drivers)
+- ✅ **Raw value operations** (get/set without JSON stringify and parsing; particularly optimized for [IndexedDB drivers](https://unstorage.unjs.io/drivers/browser#indexeddb))
 - ✅ **Utility functions** (clear errors, reset state)
 
 ### Basic Usage
@@ -225,7 +225,7 @@ function ComponentB() {
 
 ## IndexedDB Storage Hooks
 
-This section covers a collection of specialized React hooks designed specifically for IndexedDB storage drivers. These hooks provide native object storage capabilities without JSON stringification overhead, while maintaining the same API as the regular storage hooks.
+This section covers a collection of specialized React hooks designed specifically for [IndexedDB drivers](https://unstorage.unjs.io/drivers/browser#indexeddb). These hooks provide native object storage capabilities without JSON stringification overhead, while maintaining the same API as the regular storage hooks.
 
 ### Why IndexedDB-Specific Hooks?
 

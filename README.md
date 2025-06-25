@@ -9,7 +9,7 @@ This repository contains a set of React hooks for managing storage operations us
 
 ## useUnstorage Hook
 
-A comprehensive React hook for managing unstorage operations with built-in state management, loading states, and error handling.
+A comprehensive React hook for managing unstorage operations with built-in state management, loading states, and error handling. **Note**: For signal-like behavior with storage, refer to related hooks such as `useStorageSignal` discussed in later sections.
 
 ### Features
 
@@ -18,13 +18,20 @@ A comprehensive React hook for managing unstorage operations with built-in state
 - ✅ **Error handling** with custom error callbacks
 - ✅ **TypeScript support** with generic types
 - ✅ **Manual control** options (disable auto-load)
-- ✅ **Raw value operations** (get/set without JSON stringify and parsing)
+- ✅ **Raw value operations** (get/set without JSON stringify and parsing; particularly optimized for IndexedDB drivers)
 - ✅ **Utility functions** (clear errors, reset state)
 
 ### Basic Usage
 
 ```tsx
 import { useUnstorage } from './utils/hooks';
+import { createStorage } from 'unstorage';
+import localStorageDriver from 'unstorage/drivers/localStorage';
+
+// Create a storage instance
+const storage = createStorage({
+  driver: localStorageDriver()
+});
 
 function MyComponent() {
   const { 
@@ -99,8 +106,8 @@ interface UseUnstorageOptions<T = string> {
   removeValue: () => Promise<void>;          // Remove value
   loadValue: () => Promise<void>;            // Manually load value
   hasValue: () => Promise<boolean>;          // Check if key exists
-  getRawValue: () => Promise<string | null>; // Get raw string value
-  setRawValue: (value: string) => Promise<void>; // Set raw string value
+  getRawValue: () => Promise<string | null>; // Get raw string value (particularly useful with IndexedDB for non-string data)
+  setRawValue: (value: string) => Promise<void>; // Set raw string value (particularly useful with IndexedDB for non-string data)
   
   // Utilities
   clearError: () => void;  // Clear error state
@@ -177,7 +184,7 @@ const {
 
 #### Real-time Updates & Subscriptions
 
-The hook automatically subscribes to external changes by default. This means if another component or external source updates the same storage key, all subscribed components will update automatically.
+The hook automatically subscribes to external changes by default. This means if another component or external source updates the same storage key, all subscribed components will update automatically. **Note**: Detection of external changes may vary by driver; for some drivers like cookies, changes might be detected with a delay based on the polling interval or might require specific driver support.
 
 ```tsx
 // Basic subscription (enabled by default)
@@ -218,7 +225,7 @@ function ComponentB() {
 
 ## IndexedDB Storage Hooks
 
-This section covers specialized React hooks designed specifically for IndexedDB storage drivers. These hooks provide native object storage capabilities without JSON stringification overhead, while maintaining the same API as the regular storage hooks.
+This section covers a collection of specialized React hooks designed specifically for IndexedDB storage drivers. These hooks provide native object storage capabilities without JSON stringification overhead, while maintaining the same API as the regular storage hooks.
 
 ### Why IndexedDB-Specific Hooks?
 
@@ -235,11 +242,14 @@ IndexedDB can store JavaScript objects natively without requiring JSON serializa
 
 The basic IndexedDB storage hook, equivalent to `useUnstorage` but optimized for IndexedDB.
 
+**Note**: The API for `useIndexedDBStorage` is consistent with `useUnstorage`, providing the same return value structure and options for ease of use and migration.
+
 ```typescript
 import { useIndexedDBStorage } from './useIndexedDBStorage';
 import { createStorage } from 'unstorage';
 import indexeddbDriver from 'unstorage/drivers/indexedb';
 
+// Create a storage instance for IndexedDB
 const storage = createStorage({
   driver: indexeddbDriver({ base: 'my-app' })
 });
@@ -307,6 +317,8 @@ function TodoList() {
 #### 3. `useIndexedDBHybridSignal`
 
 Hybrid signal that combines in-memory reactivity with persistent IndexedDB storage, equivalent to `useHybridSignal` but optimized for IndexedDB.
+
+**Note**: Unlike `useUnstorage` and `useIndexedDBStorage`, this hook uses a signal-like API with methods such as `set` and `update` for immediate reactivity, while still maintaining persistence.
 
 ```typescript
 import { useIndexedDBHybridSignal } from './useIndexedDBHybridSignal';
@@ -447,6 +459,9 @@ The Hybrid Signal System combines the **immediate reactivity of signals** with t
 - ✅ **Configurable performance** - Choose your trade-offs
 - ✅ **Debounced writes** - Optimize storage performance
 - ✅ **Native IndexedDB Storage** - Uses `setItemRaw` for storing objects as-is in IndexedDB without JSON stringification
+- ✅ **Simultaneous signals and polling** - Supports immediate signal updates alongside polling for external change detection
+
+**Note**: This dual mechanism of signals and polling is crucial for collaborative, real-time applications where both user experience and data consistency are priorities.
 
 ### 🚀 Quick Start
 
@@ -567,11 +582,16 @@ update(u => ({
 
 #### 5. **Computed Values**
 ```tsx
-const { value } = useHybridSignal(storage, "user", { defaultValue: { age: 30 } });
+// Used to establish a base signal with useHybridSignal that holds the user's data (specifically their age)
+const { value: userData } = useHybridSignal(storage, "user", { defaultValue: { age: 30 } });
 
-// Computed values that update automatically
+// Computed values that update automatically based on the base signal
 const isAdult = useComputedHybridSignal(storage, "user", { age: 30 }, u => u.age >= 18);
 const ageInDays = useComputedHybridSignal(storage, "user", { age: 30 }, u => u.age * 365);
+
+// These computed values react to changes in userData.age
+console.log(`User is adult: ${isAdult}`);
+console.log(`Age in days: ${ageInDays}`);
 ```
 
 ### ⚡ Performance Comparison
@@ -620,25 +640,4 @@ const { value, set } = useHybridSignal(storage, "local-data", {
 
 ### 🎯 Best Practices
 
-#### 1. **Choose the Right Pattern**
-- **UI State**: Use immediate updates (`set`)
-- **Important Data**: Use async updates (`setAsync`)
-
-#### 2. **Optimize Performance**
-- **Frequent Updates**: Use debounced writes (default)
-- **Critical Updates**: Use immediate storage writes
-- **Local State**: Disable persistence when not needed
-
-#### 3. **Handle Complex Data**
-- Use immutable updates for nested objects
-- Use computed signals for derived data
-
-#### 4. **Error Management**
-- Always provide error handlers for critical data
-- Consider fallback strategies for failed operations
-
-## Project Overview
-
-This project demonstrates the usage of `unstorage` with React hooks for various storage drivers, including localStorage, sessionStorage, IndexedDB, and custom drivers like cookies. The hooks are designed to optimize performance and provide a seamless experience for state management with persistence.
-
-For more details on specific hooks, refer to the sections above. To see the hooks in action, check the example components in `src/`.
+// ... TODO ...

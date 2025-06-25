@@ -1,11 +1,11 @@
 # Hybrid-Storage
 
-This repository contains a set of React hooks for managing storage operations using the `unstorage` library, with specialized hooks for IndexedDB and hybrid signal systems. Below is the comprehensive documentation for all available hooks.
+This repository contains a set of React custom hooks using the `unstorage` library.  Below is the comprehensive documentation for all available hooks.
 
 ## Table of Contents
 - [useUnstorage Hook](#useunstorage-hook)
-- [IndexedDB Storage Hooks](#indexeddb-storage-hooks)
-- [Hybrid Signal System](#hybrid-signal-system)
+- [IndexedDB version of the Hooks](#indexeddb-storage-hooks)
+- [Hybrid Signal System version of the Hooks](#hybrid-signal-system)
 
 ## useUnstorage Hook
 

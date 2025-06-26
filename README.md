@@ -203,6 +203,12 @@ const { value, setValue } = useUnstorage(storage, "local-key", {
 const { value, setValue } = useUnstorage(storage, "fast-updates", {
   pollInterval: 100 // Check every 100ms for faster updates
 });
+
+// Disable polling but keep subscription
+const { value, setValue } = useUnstorage(storage, "no-polling", {
+  subscribe: true,
+  pollInterval: 0 // Disables polling, only in-tab updates will be detected
+});
 ```
 
 ##### Cross-Component Synchronization

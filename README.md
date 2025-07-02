@@ -651,3 +651,19 @@ const { value, set } = useHybridSignal(storage, "local-data", {
 ### Screen shot of testing (npm run dev and open http://localhost:5173/ in multiple tabs)
 
 ![image](https://github.com/user-attachments/assets/e29aa748-3373-48f9-8627-2caa86156279)
+
+## Importing Hooks
+
+This library provides flexibility in how you can import the hooks:
+
+- **Via the barrel file (index.js):** Import all hooks and utilities from the main entry point for convenience.
+  ```javascript
+  import { useUnstorage, useHybridSignal } from 'hybrid-storage';
+  ```
+- **Via individual hook files:** Import specific hooks to reduce bundle size by only loading what you need.
+  ```javascript
+  import { useUnstorage } from 'hybrid-storage/useUnstorage';
+  import { useHybridSignal } from 'hybrid-storage/useHybridSignal';
+  ```
+
+Choose the method that best suits your project's needs for either ease of use or optimized bundle size.

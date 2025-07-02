@@ -15,7 +15,4 @@ export { indexedDBSubscriptionManager } from './useIndexedDBStorage';
 // Types
 export type { UseUnstorageOptions } from './useUnstorage';
 export type { UseIndexedDBOptions } from './useIndexedDBStorage';
-export type { UseIndexedDBHybridSignalOptions } from './useIndexedDBHybridSignal';
-
-export { UnstorageExample } from './useUnstorage.example';
-export { HybridSignalDemo } from './hybrid-signal-demo'; 
+export type { UseIndexedDBHybridSignalOptions } from './useIndexedDBHybridSignal'; 

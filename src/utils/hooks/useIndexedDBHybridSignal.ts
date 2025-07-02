@@ -1,16 +1,21 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Storage, StorageValue } from 'unstorage';
+import { Type } from '@sinclair/typebox';
+import type { Static } from '@sinclair/typebox';
 
-export interface UseIndexedDBHybridSignalOptions<T = unknown> {
-  defaultValue: T;
-  autoLoad?: boolean;
-  onError?: (error: Error) => void;
-  fallbackToDefault?: boolean;
-  subscribe?: boolean;
-  pollInterval?: number;
-  immediate?: boolean; // Whether to update immediately (like signals) or persist first
-  debounceMs?: number; // Debounce time for storage updates
-}
+// Schema for UseIndexedDBHybridSignalOptions
+export const UseIndexedDBHybridSignalOptionsSchema = Type.Object({
+  defaultValue: Type.Any(),
+  autoLoad: Type.Optional(Type.Boolean()),
+  onError: Type.Optional(Type.Function([Type.Object({})], Type.Void())),
+  fallbackToDefault: Type.Optional(Type.Boolean()),
+  subscribe: Type.Optional(Type.Boolean()),
+  pollInterval: Type.Optional(Type.Number()),
+  immediate: Type.Optional(Type.Boolean()),
+  debounceMs: Type.Optional(Type.Number())
+});
+
+export type UseIndexedDBHybridSignalOptions<T = unknown> = Static<typeof UseIndexedDBHybridSignalOptionsSchema> & { defaultValue: T };
 
 // Hybrid signal implementation that combines immediate updates with persistence
 export class IndexedDBHybridSignal<T = unknown> {

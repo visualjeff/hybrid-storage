@@ -1,23 +1,31 @@
 import { defineDriver } from "unstorage";
+import { Type } from '@sinclair/typebox';
+import type { Static } from '@sinclair/typebox';
 
 const DRIVER_NAME = "cookie";
 
-interface CookieOptions {
-  prefix?: string;
-  maxAge?: number;
-  path?: string;
-  domain?: string;
-  secure?: boolean;
-  sameSite?: "Strict" | "Lax" | "None";
-}
+// Schema for CookieOptions
+export const CookieOptionsSchema = Type.Object({
+  prefix: Type.Optional(Type.String()),
+  maxAge: Type.Optional(Type.Number()),
+  path: Type.Optional(Type.String()),
+  domain: Type.Optional(Type.String()),
+  secure: Type.Optional(Type.Boolean()),
+  sameSite: Type.Optional(Type.Union([Type.Literal('Strict'), Type.Literal('Lax'), Type.Literal('None')]))
+});
 
-interface CookieSetOptions {
-  maxAge?: number;
-  path?: string;
-  domain?: string;
-  secure?: boolean;
-  sameSite?: "Strict" | "Lax" | "None";
-}
+export type CookieOptions = Static<typeof CookieOptionsSchema>;
+
+// Schema for CookieSetOptions
+export const CookieSetOptionsSchema = Type.Object({
+  maxAge: Type.Optional(Type.Number()),
+  path: Type.Optional(Type.String()),
+  domain: Type.Optional(Type.String()),
+  secure: Type.Optional(Type.Boolean()),
+  sameSite: Type.Optional(Type.Union([Type.Literal('Strict'), Type.Literal('Lax'), Type.Literal('None')]))
+});
+
+export type CookieSetOptions = Static<typeof CookieSetOptionsSchema>;
 
 export default defineDriver((opts: CookieOptions = {}) => {
   const {

@@ -1,14 +1,19 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Storage, StorageValue } from 'unstorage';
+import { Type } from '@sinclair/typebox';
+import type { Static } from '@sinclair/typebox';
 
-export interface UseUnstorageOptions<T = string> {
-  defaultValue?: T;
-  autoLoad?: boolean;
-  onError?: (error: Error) => void;
-  fallbackToDefault?: boolean; // Whether to fall back to defaultValue when key doesn't exist
-  subscribe?: boolean; // Whether to subscribe to external changes (default: true)
-  pollInterval?: number; // Polling interval in ms for drivers without change events (default: 1000)
-}
+// Schema for UseUnstorageOptions
+export const UseUnstorageOptionsSchema = Type.Object({
+  defaultValue: Type.Optional(Type.Any()),
+  autoLoad: Type.Optional(Type.Boolean()),
+  onError: Type.Optional(Type.Function([Type.Object({})], Type.Void())),
+  fallbackToDefault: Type.Optional(Type.Boolean()),
+  subscribe: Type.Optional(Type.Boolean()),
+  pollInterval: Type.Optional(Type.Number())
+});
+
+export type UseUnstorageOptions<T = string> = Static<typeof UseUnstorageOptionsSchema> & { defaultValue?: T };
 
 // Global subscription manager
 class StorageSubscriptionManager {

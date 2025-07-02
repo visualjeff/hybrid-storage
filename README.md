@@ -647,3 +647,7 @@ const { value, set } = useHybridSignal(storage, "local-data", {
 ### 🎯 Best Practices
 
 // ... TODO ...
+
+### Screen shot of testing (npm run dev and open http://localhost:5173/ in multiple tabs)
+
+![image](https://github.com/user-attachments/assets/e29aa748-3373-48f9-8627-2caa86156279)

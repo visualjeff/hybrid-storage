@@ -18,7 +18,7 @@ export type UseUnstorageOptions<T = string> = Static<typeof UseUnstorageOptionsS
 // Global subscription manager
 class StorageSubscriptionManager {
   private subscriptions = new Map<string, Set<() => void>>();
-  private pollIntervals = new Map<string, number>();
+  private pollIntervals = new Map<string, NodeJS.Timeout>();
   private lastValues = new Map<string, unknown>();
   private storageInstances = new Map<string, Storage>();
 

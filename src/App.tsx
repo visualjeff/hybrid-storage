@@ -6,7 +6,7 @@ import localStorageDriver from "unstorage/drivers/localstorage";
 //import indexedDbDriver from "unstorage/drivers/indexedb";
 // import cookieDriver from "./utils/drivers/cookie";
 import { useUnstorage } from './utils/hooks';
-import { HybridSignalDemo } from './utils/hooks';
+import { HybridSignalDemo } from './utils/hooks/hybrid-signal-demo';
 import viteLogo from '/vite.svg'
 import './App.css'
 

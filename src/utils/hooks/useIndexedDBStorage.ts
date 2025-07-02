@@ -18,7 +18,7 @@ export type UseIndexedDBOptions<T = unknown> = Static<typeof UseIndexedDBOptions
 // Global subscription manager for IndexedDB
 class IndexedDBSubscriptionManager {
   private subscriptions = new Map<string, Set<() => void>>();
-  private pollIntervals = new Map<string, number>();
+  private pollIntervals = new Map<string, NodeJS.Timeout>();
   private lastValues = new Map<string, unknown>();
   private storageInstances = new Map<string, Storage>();
 

@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "npx --yes rimraf dist && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "build:lib": "vite build -c vite.config.lib.ts && node -e \"const fs = require('fs'); const path = require('path'); const distDir = path.join(__dirname, 'dist'); fs.readdirSync(distDir).forEach(file => { if ((file.endsWith('.d.ts') && !file.match(/^(index|useUnstorage(?!.*example)|useIndexedDB(?!.*example)|useHybridSignal)/)) || file === 'vite.svg') { fs.unlinkSync(path.join(distDir, file)); console.log('Removed:', file); } });\"",
+    "build:lib": "npx --yes rimraf dist && vite build -c vite.config.lib.ts && node -e \"const fs = require('fs'); const path = require('path'); const distDir = path.join(__dirname, 'dist'); fs.readdirSync(distDir).forEach(file => { if ((file.endsWith('.d.ts') && !file.match(/^(index|useUnstorage(?!.*example)|useIndexedDB(?!.*example)|useHybridSignal)/)) || file === 'vite.svg') { fs.unlinkSync(path.join(distDir, file)); console.log('Removed:', file); } });\"",
     "pack:lib": "npm run build:lib && npm pack"
   },
   "dependencies": {

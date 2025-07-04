@@ -278,7 +278,7 @@ export function useIndexedDBStorage<T = unknown>(
         unsubscribeRef.current = null;
       }
     };
-  }, [key, subscribe, pollInterval, loadValue]);
+  }, [key, subscribe, pollInterval, loadValue, storage]);
 
   // Auto-load value on mount if enabled
   useEffect(() => {

@@ -1,0 +1,41 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "oxc",
+    "react",
+    "typescript",
+    "unicorn"
+  ],
+  "env": {
+    "browser": true
+  },
+  "globals": {
+  },
+  "ignorePatterns": [
+    "node_modules/",
+    "dist/",
+    "build/",
+    "coverage/",
+    "out/",
+    "public/",
+    "tmp/",
+    "temp/",
+    "removeGraphQL.mjs"
+  ],
+  "settings": {},
+  "rules": {
+    "eqeqeq": "error",
+    "no-unused-vars": "off",
+    "no-document-cookie": "off"
+  },
+  "overrides": [
+    {
+      "files": [
+        "*.test.ts",
+        "*.spec.ts"
+      ],
+      "rules": {
+      }
+    }
+  ]
+}

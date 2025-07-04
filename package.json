@@ -1,12 +1,13 @@
 {
   "name": "hybrid-storage",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "npx --yes rimraf dist && tsc -b && vite build",
     "lint": "eslint .",
+    "lint:oxlint": "npx oxlint -c oxlintrc.json",
     "preview": "vite preview",
     "build:lib": "npx --yes rimraf dist && vite build -c vite.config.lib.ts && node -e \"const fs = require('fs'); const path = require('path'); const distDir = path.join(__dirname, 'dist'); fs.readdirSync(distDir).forEach(file => { if ((file.endsWith('.d.ts') && !file.match(/^(index|useUnstorage(?!.*example)|useIndexedDB(?!.*example)|useHybridSignal)/)) || file === 'vite.svg') { fs.unlinkSync(path.join(distDir, file)); console.log('Removed:', file); } });\"",
     "pack:lib": "npm run build:lib && npm pack"
@@ -14,8 +15,6 @@
   "dependencies": {
     "@sinclair/typebox": "^0.34.37",
     "idb-keyval": "^6.2.2",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
     "unstorage": "^1.16.0"
   },
   "devDependencies": {
@@ -70,5 +69,22 @@
     "./useIndexedDBStorage.utils": {
       "import": "./dist/useIndexedDBStorage.utils.js"
     }
+  },
+  "keywords": [
+    "unstorage",
+    "indexeddb",
+    "hybrid",
+    "signal",
+    "storage"
+  ],
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "author": "Jeffrey Gilbert",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/visualjeff/hybrid-storage.git"
   }
 }

@@ -219,7 +219,7 @@ export function useIndexedDBHybridSignal<T = unknown>(
         indexedDBHybridSignalRegistry.delete(signalKey);
       }
     };
-  }, [key, subscribe, pollInterval]);
+  }, [key, subscribe, pollInterval, defaultValue, onError, storage]);
 
   // Signal-like immediate setter
   const set = useCallback((newValue: T | ((current: T) => T), options?: { persist?: boolean; debounce?: boolean }) => {

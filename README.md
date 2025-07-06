@@ -2,11 +2,11 @@
 
 This repository contains a set of React hooks for managing storage operations using the [unstorage](https://unstorage.unjs.io/) library, with specialized hooks for IndexedDB and hybrid signal systems. Below is the comprehensive documentation for all available hooks.
 
-## Usage
-1. Clone repo
-2. Install dependencies (npm install)
-3. Preview functionality in sample app (npm build && npm preview)
-4. Build and package library (npm run pack:lib)
+## Installation
+
+```bash
+npm install hybrid-storage
+```
 
 ## Table of Contents
 - [useUnstorage Hook](#useunstorage-hook)
